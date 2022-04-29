@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+    client:
+        container_name: client
+        image: booking-client:1.0.0
+        build:
+            context: ./booking-client
+            target: development
+            dockerfile: ./Dockerfile
+        volumes:
+            - ./booking-client:/usr/src/app
+            - /usr/src/app/node_modules
+        ports:
+            - 3000:3000
+        networks:
+            - app-network
+        environment:
+            - NODE_ENV=development
+    
+    api:
+        container_name: api
+        image: booking-api:1.0.0
+        build:
+            context: ./booking-api
+            target: development
+            dockerfile: ./Dockerfile
+        command: npm run start:debug
+        ports:
+            - 8080:3000
+            - 9229:9229
+        networks:
+            - app-network
+        volumes:
+            - ./booking-api:/usr/src/app
+            - /usr/src/app/node_modules
+        depends_on:
+            - db
+        environment:
+            - DATABASE_URL=mongodb://root:restaurant@mongo:27017/
+            - NODE_ENV=development
+        restart: unless-stopped
+    
+    db:
+        container_name: db
+        image: mongo:latest
+        restart: always
+        volumes: 
+            - db-volume:/data/db
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: restaurant
+
+    db-admin:
+        container_name: db-admin
+        image: mongo-express:latest
+        restart: always
+        ports:
+            - 8081:8081
+        depends_on:
+            - db
+        environment:
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: restaurant
+            ME_CONFIG_MONGODB_SERVER: db
+            ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+            ME_CONFIG_BASICAUTH_USERNAME: admin
+            ME_CONFIG_BASICAUTH_PASSWORD: admin
+networks:
+    app-network:
+
+volumes:
+  db-volume:
+    
