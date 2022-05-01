@@ -37,7 +37,9 @@ services:
         depends_on:
             - db
         environment:
-            - DATABASE_URL=mongodb://root:restaurant@mongo:27017/
+            - DB_URL=mongodb://db:27017
+            - DB_USER=admin
+            - DB_PWD=admin123
             - NODE_ENV=development
         restart: unless-stopped
     
@@ -47,9 +49,12 @@ services:
         restart: always
         volumes: 
             - db-volume:/data/db
+        networks:
+            - app-network
         environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: restaurant
+            MONGO_INITDB_ROOT_USERNAME: admin
+            MONGO_INITDB_ROOT_PASSWORD: admin123
+            MONGO_INITDB_DATABASE: bookingtabledb
 
     db-admin:
         container_name: db-admin
@@ -59,13 +64,15 @@ services:
             - 8081:8081
         depends_on:
             - db
+        networks:
+            - app-network
         environment:
-            ME_CONFIG_MONGODB_ADMINUSERNAME: root
-            ME_CONFIG_MONGODB_ADMINPASSWORD: restaurant
+            ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+            ME_CONFIG_MONGODB_ADMINPASSWORD: admin123
             ME_CONFIG_MONGODB_SERVER: db
             ME_CONFIG_MONGODB_ENABLE_ADMIN: true
-            ME_CONFIG_BASICAUTH_USERNAME: admin
-            ME_CONFIG_BASICAUTH_PASSWORD: admin
+            ME_CONFIG_BASICAUTH_USERNAME: memongo
+            ME_CONFIG_BASICAUTH_PASSWORD: memongo
 networks:
     app-network:
 
