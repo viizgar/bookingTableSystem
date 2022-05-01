@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RestaurantModule } from './restaurant/restaurant.module';
+import { BookingsModule } from './bookings/bookings.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { RestaurantModule } from './restaurant/restaurant.module';
         pass: process.env.DB_PWD
     }),
     RestaurantModule,
+    BookingsModule,
   ],
 })
 export class AppModule {}
