@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Table } from "react-bootstrap";
+import { Button, Form, Table } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import axiosClient from "../../axios";
@@ -10,66 +10,97 @@ import Restaurant from "../../types/Restaurant";
 
 
 
-export default function RestaurantInfoForm() {
-    const { register, 
-        reset, 
-        handleSubmit, 
-        formState } = useForm();
+export default function RestaurantInfoForm(props: { restaurant: any; }) {
+  const [restaurantFormState, setRestaurantFormState] = useState(props.restaurant);
+
+  const createRestaurant = async (data: Restaurant) => {
+    const { data: response } = await axiosClient.post('/restaurant', data);
+    return response.data;
+  };
+
+  const updateRestaurant = async (data: Restaurant) => {
+    const { data: response } = await axiosClient.put('/restaurant/'+props.restaurant._id, data);
+    return response.data;
+  };
+
+  const { mutate:createMutation, isLoading:isLoadingCreation } = useMutation(createRestaurant, {
+    onSuccess: data => {
+      console.log(data);
+      const message = "Restaurant created"
+      alert(message);
+    },
+    onError: () => {
+      alert("there was an error")
+    }
+  });
+
+  const { mutate:updateMutation, isLoading:isLoadingUpload } = useMutation(updateRestaurant, {
+    onSuccess: data => {
+      console.log(data);
+      const message = "Restaurant modified"
+      alert(message);
+    },
+    onError: () => {
+      alert("there was an error")
+    }
+  });
+
+  const handleChange = (event: any ) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setRestaurantFormState((values: any) => ({...values, [name]: value}))
+  }
+
+  const onFormSubmit = (event: any) => {
+    event.preventDefault();
+    console.log(restaurantFormState);
+    //Update
+    if(props.restaurant._id){
+      updateMutation(restaurantFormState);
+    }else{
+      //Create new
+      createMutation(restaurantFormState);
+      setRestaurantFormState({});
+      event.target.reset();
+    }
     
-    const createRestaurant = async (data: Restaurant) => {
-        const { data: response } = await axiosClient.post('/restaurant', data);
-        return response.data;
-      };
+  }
 
-    const { mutate, isLoading } = useMutation(createRestaurant, {
-        onSuccess: data => {
-          console.log(data);
-          const message = "Restaurant created"
-          alert(message);
-          data = null;
-        },
-        onError: () => {
-          alert("there was an error")
-        }
-      });
+  const onErrors = (errors: any) => console.error(errors);
 
-    const onFormSubmit  = (data: any) => mutate(data);
-    const onErrors = (errors: any) => console.error(errors);
-   
-    // Clean fields on component rerender
-    useEffect(() => {
-        if (formState.isSubmitSuccessful) {
-          reset();
-        }
-      }, [formState, reset]);
+  return (
+    <div className="restaurantForm">
+      <Form onSubmit={(e)=> onFormSubmit(e)}>
+        <Form.Group className="mb-3" controlId="name">
+          <Form.Label>Name</Form.Label>
+          <Form.Control name="name" type="text" onChange={handleChange} value={restaurantFormState.name}/>
+        </Form.Group>
 
-    return (
-        <div className="restaurantForm">
-        <form onSubmit={handleSubmit(onFormSubmit, onErrors)}>
-        <label>
-          Name:
-          <input type="text" {...register('name')} />
-        </label>
-       
-        <label>
-          Owner name:
-          <input type="text" {...register('owner')} />
-        </label>
-        <label>
-          Opening Hour:
-          <input type="number" {...register('opening_hour')} />
-        </label>
-        <label>
-          Closing Hour:
-          <input type="number" {...register('closing_hour')} />
-        </label>
-        <label>
-          Number of tables:
-          <input type="number" {...register('total_tables')} />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
-      </div>
-    );
+        <Form.Group className="mb-3" controlId="owner">
+          <Form.Label>Owner</Form.Label>
+          <Form.Control name="owner" type="text" onChange={handleChange} value={restaurantFormState.owner}/>
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="opening_hour">
+          <Form.Label>Opening Hour</Form.Label>
+          <Form.Control name="opening_hour" type="number" onChange={handleChange} value={restaurantFormState.opening_hour}/>
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="closing_hour">
+          <Form.Label>Closing Hour</Form.Label>
+          <Form.Control name="closing_hour" type="number" onChange={handleChange} value={restaurantFormState.closing_hour}/>
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="total_tables">
+          <Form.Label>Number of tables</Form.Label>
+          <Form.Control name="total_tables" type="number" onChange={handleChange} value={restaurantFormState.total_tables}/>
+        </Form.Group>
+
+        <Button variant="primary" type="submit">
+          Submit
+        </Button>
+      </Form>
+    </div>
+  );
 
 }

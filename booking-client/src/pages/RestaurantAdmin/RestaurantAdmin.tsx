@@ -32,7 +32,7 @@ export default function RestaurantAdmin() {
           <h2>Owner:{data.owner}</h2>
           <hr></hr>
           <h2>Restaurant configuration</h2>
-          <RestaurantInfoForm></RestaurantInfoForm>
+          <RestaurantInfoForm restaurant={data}></RestaurantInfoForm>
           <h2></h2>
           <hr></hr>
           <BookingTable restaurantId={id as any}></BookingTable>

@@ -20,7 +20,7 @@ type BookingProps = { restaurantId: string}
 const BookingTable= ({restaurantId}: BookingProps) => {
     const { status, data, error, isFetching } = useBookings(restaurantId);
 
-    const [show, setShow] = useState(false);
+    const [modalState, setModalState] = useState({booking: {}, show: false});
 
     const deleteBooking = async (id: string) => {
         const { data: response } = await axiosClient.delete('/bookings/'+id);
@@ -38,12 +38,12 @@ const BookingTable= ({restaurantId}: BookingProps) => {
         }
       });
 
-      const handleUpdate = (id:string) => {
-        setShow(true);
+      const handleUpdate = (booking: Booking) => {
+        setModalState({booking: booking, show: true});
         
     }
     const handleClose = (id:string) => {
-        setShow(false);
+        setModalState({booking: {}, show: false});
     }
 
       const handleDelete = (id:string) => {
@@ -83,7 +83,7 @@ const BookingTable= ({restaurantId}: BookingProps) => {
                                 <td key={booking._id+"-5"}>{booking.confirmed.toString()}</td>
                                 <td key={booking._id+"-6"}>
                                 <ButtonGroup>
-                                    <Button onClick={() => {handleUpdate(booking._id) as any}}>Update</Button>
+                                    <Button onClick={() => {handleUpdate(booking) as any}}>Update</Button>
                                     <Button onClick={() => {handleDelete(booking._id) as any}}>Delete</Button>
                                 </ButtonGroup>
                                 </td>
@@ -95,7 +95,7 @@ const BookingTable= ({restaurantId}: BookingProps) => {
 
       )}
 
-<BookingFormModal show={show} handleUpdate={handleUpdate} handleClose={handleClose}/>
+<BookingFormModal selectedBooking={modalState.booking} show={modalState.show} handleUpdate={handleUpdate} handleClose={handleClose}/>
 
     </>
         

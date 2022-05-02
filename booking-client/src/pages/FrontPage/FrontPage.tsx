@@ -9,7 +9,7 @@ export default function FrontPage() {
           <h2>Choose your favourite restaurant</h2>
           <RestaurantTable/>
           <h2>Or create new restaurant</h2>
-          <RestaurantInfoForm/>
+          <RestaurantInfoForm restaurant={{}}/>
         </div>
       );
 
