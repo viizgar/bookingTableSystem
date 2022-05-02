@@ -10,7 +10,7 @@ services:
             dockerfile: ./Dockerfile
         volumes:
             - ./booking-client:/usr/src/app
-            - /usr/src/app/node_modules
+            - front_node_modules:/usr/src/app/node_modules
         ports:
             - 3000:3000
         networks:
@@ -34,7 +34,7 @@ services:
             - app-network
         volumes:
             - ./booking-api:/usr/src/app
-            - /usr/src/app/node_modules
+            - api_node_modules:/usr/src/app/node_modules
         depends_on:
             - db
         environment:
@@ -79,4 +79,6 @@ networks:
 
 volumes:
   db-volume:
+  front_node_modules:
+  api_node_modules:
     
