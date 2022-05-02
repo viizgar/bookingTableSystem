@@ -2,7 +2,35 @@
 
 
 .App {
+  height: auto;
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
-  height: auto;
+  flex-direction: column;
+  ;
+  .frontMenuWrapper{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    margin: auto;
+    .subMenu{
+      max-width: 50%;
+      margin: 50px 50px;
+    }
+
+    
+  }
+
+  .adminPanelWrapper{
+    display: flexbox;
+    max-width: 90%;
+    min-width: 50%;
+    margin: auto;
+  }
+
+  .table{
+    .btn{
+      margin:0 5px;
+    }
+  }
 }

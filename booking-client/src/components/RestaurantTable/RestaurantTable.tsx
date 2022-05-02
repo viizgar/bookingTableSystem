@@ -20,8 +20,6 @@ export default function RestaurantTable() {
 
     return (
         <>
-            
-
             {status === "loading" ? (
                 <span>Loading restaurant list...</span>
             ) : status === "error" ? (

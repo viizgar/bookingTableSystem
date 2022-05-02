@@ -5,95 +5,104 @@ import { useMutation } from "react-query";
 import axiosClient from "../../axios";
 import Booking from "../../types/Booking";
 
-export default function BookingFormModal({selectedBooking, show, handleUpdate, handleClose} : any) {
-  const { register, 
-    reset, 
-    handleSubmit, 
-    formState } = useForm();
-    
-    const createBooking = async (data: Booking) => {
-      const { data: response } = await axiosClient.post('/bookings', data);
-      return response.data;
-    };
+export default function BookingFormModal({ restaurantId, selectedBooking, show, handleUpdate, handleClose }: any) {
 
-    const modifyBooking = async (data: Booking) => {
-      console.log(data);
-      const { data: response } = await axiosClient.put('/bookings/'+selectedBooking._id, data);
-      return response.data;
-    };
+
+  const [bookingFormState, setBookingFormState] = useState(selectedBooking);
+
+
+  const createBooking = async (data: Booking) => {
+    const { data: response } = await axiosClient.post('/bookings', data);
+    return response.data;
+  };
+
+  const modifyBooking = async (data: Booking) => {
+    console.log(data);
+    const { data: response } = await axiosClient.put('/bookings/' + selectedBooking._id, data);
+    return response.data;
+  };
 
   const { mutate: createMutation, isLoading: isLoadingCreation } = useMutation(createBooking, {
-      onSuccess: data => {
-        console.log(data);
-        const message = "Booking created"
-        alert(message);
-        
-      },
-      onError: () => {
-        alert("there was an error")
-      }
-    });
+    onSuccess: data => {
+      console.log(data);
+      const message = "Booking created"
+      alert(message);
 
-    const { mutate: modMutation, isLoading: isLoadingMod } = useMutation(modifyBooking, {
-      onSuccess: data => {
-        console.log(data);
-      },
-      onError: () => {
-        alert("there was an error")
-      }
-    });
+    },
+    onError: () => {
+      alert("there was an error")
+    }
+  });
 
-  const onFormSubmit  = (data: any) => () => {
-    console.log("Submit", data);
-    modMutation(data);
+  const { mutate: updateMutation, isLoading: isLoadingMod } = useMutation(modifyBooking, {
+    onSuccess: data => {
+      console.log(data);
+    },
+    onError: () => {
+      alert("there was an error")
+    }
+  });
+
+  const handleChange = (event: any) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setBookingFormState((values: any) => ({ ...values, [name]: value }))
   }
 
-    const onErrors = (errors: any) => console.error(errors);
+  const onFormSubmit = (event: any) => {
+    event.preventDefault();
+    console.log(bookingFormState);
+    //Update
+    if (bookingFormState._id) {
+      updateMutation(bookingFormState);
+    } else {
+      //Create new
+      const newBooking = {...bookingFormState, restaurant: restaurantId}
+      console.log(newBooking)
+      createMutation(newBooking as any);
+      setBookingFormState({});
+      event.target.reset();
+    }
 
-   const formatDate = (date : Date) => {
-      console.log(date);
-      return date ? date.toString().split("T")[0] : "";
-   }
-
-    console.log("SelectedBooking", selectedBooking);
-    return (
-        <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Update booking</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="bookingForm">
-        <form id='booking-form' onSubmit={handleSubmit(onFormSubmit, onErrors)}>
-        <label>
-          Client name:
-          <input type="text" {...register('client_name')} value={selectedBooking.client_name}/>
-        </label>
-       
-        <label>
-          Date:
-          <input type="date" {...register('date')} value={formatDate(selectedBooking.date)}/>
-        </label>
-        <label>
-          Timeslot:
-          <input type="number" {...register('timeslot')} value={selectedBooking.timeslot}/>
-        </label>
-        <label>
-          Number of customers:
-          <input type="number" {...register('customer_nr')} value={selectedBooking.customer_nr}/>
-        </label>
-      </form>
-      </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
-              Close
-            </Button>
-            <Button variant="primary" type="submit" form='booking-form'>
-              Save Changes
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      
-    );
   }
-  
+
+  return (
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Update booking</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form id="booking-form" onSubmit={(e) => onFormSubmit(e)}>
+          <Form.Group className="mb-3" controlId="client_name">
+            <Form.Label>Client name</Form.Label>
+            <Form.Control name="client_name" type="text" onChange={handleChange} value={bookingFormState.client_name} />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="date">
+            <Form.Label>Date</Form.Label>
+            <Form.Control name="date" type="date" onChange={handleChange} value={bookingFormState.date} />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="timeslot">
+            <Form.Label>Timeslot</Form.Label>
+            <Form.Control name="timeslot" type="number" onChange={handleChange} value={bookingFormState.timeslot} />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="customer_nr">
+            <Form.Label>Number of customers</Form.Label>
+            <Form.Control name="customer_nr" type="number" onChange={handleChange} value={bookingFormState.customer_nr} />
+          </Form.Group>
+        </Form>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Close
+        </Button>
+        <Button variant="primary" type="submit" form='booking-form'>
+          Save Changes
+        </Button>
+      </Modal.Footer>
+    </Modal>
+
+  );
+}

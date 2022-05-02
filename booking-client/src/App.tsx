@@ -16,10 +16,11 @@ function App() {
       <Routes>
         <Route path="/" element={<NavigationMenu />}>
           <Route index element={<FrontPage />} />
+          <Route path="/admin/:id" element={<RestaurantAdmin />} />
+        <Route path="/bookings/:id" element={<BookingSite />} />
           <Route path="*" element={<NotFound />} />
         </Route>
-        <Route path="/admin/:id" element={<RestaurantAdmin />} />
-        <Route path="/bookings/:id" element={<BookingSite />} />
+        
       </Routes>
     </div>
     </QueryClientProvider>

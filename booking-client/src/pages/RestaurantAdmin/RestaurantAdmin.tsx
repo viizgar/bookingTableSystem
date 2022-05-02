@@ -27,15 +27,12 @@ export default function RestaurantAdmin() {
       ) : status === "error" ? (
         <span>Ups.. error loading the restaurant, please try again</span>
       ) : (
-        <div>
+        <div className="adminPanelWrapper">
           <h1>Welcome to restaurant: {data.name}</h1>
           <h2>Owner:{data.owner}</h2>
           <hr></hr>
           <h2>Restaurant configuration</h2>
           <RestaurantInfoForm restaurant={data}></RestaurantInfoForm>
-          <h2></h2>
-          <hr></hr>
-          <BookingTable restaurantId={id as any}></BookingTable>
         </div>
       )}
     </>

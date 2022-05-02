@@ -5,11 +5,15 @@ import RestaurantTable from "../../components/RestaurantTable/RestaurantTable";
 
 export default function FrontPage() {
     return (
-        <div>
+        <div className="frontMenuWrapper">
+          <div className="subMenu">
           <h2>Choose your favourite restaurant</h2>
           <RestaurantTable/>
-          <h2>Or create new restaurant</h2>
+          </div>
+          <div className="subMenu">
+          <h2>Or create a new restaurant</h2>
           <RestaurantInfoForm restaurant={{}}/>
+          </div>
         </div>
       );
 
