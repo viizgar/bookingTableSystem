@@ -11,9 +11,7 @@ export default function NavigationMenu() {
                     </li>
                 </ul>
             </nav>
-
             <hr />
-
             <Outlet />
         </div>
     );

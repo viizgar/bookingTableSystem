@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Link, Outlet } from "react-router-dom";
 import RestaurantInfoForm from "../../components/RestaurantInfoForm/RestaurantInfoForm";
 import RestaurantTable from "../../components/RestaurantTable/RestaurantTable";
 

@@ -2,10 +2,8 @@ import * as React from "react";
 import { useState } from "react";
 import { Button, ButtonGroup, Form, Modal, Table } from "react-bootstrap";
 import { useMutation, useQuery } from "react-query";
-import { Link, Outlet } from "react-router-dom";
 import axiosClient from "../../axios";
 import Booking from "../../types/Booking";
-import BookingFormModal from "../BookingFormModal/BookingFormModal";
 
 function useBookings(id: string | undefined) {
   return useQuery("bookings", async () => {
@@ -18,7 +16,7 @@ function useBookings(id: string | undefined) {
 
 type BookingProps = { restaurantId: string }
 const BookingTable = ({ restaurantId }: BookingProps) => {
-  const { status, data, error, isFetching } = useBookings(restaurantId);
+  const { status, data } = useBookings(restaurantId);
 
   const [showModal, setShowModal] = useState(false);
   const [bookingFormState, setBookingFormState] = useState({} as any);
@@ -28,7 +26,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
     return response.data;
   };
 
-  const { mutate, isLoading } = useMutation(deleteBooking, {
+  const { mutate } = useMutation(deleteBooking, {
     onSuccess: (res: any) => {
       console.log(res);
       const message = "Booking deleted successfuly"
@@ -64,7 +62,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
     return timeslot < 10 ? `0${timeslot.toString()}:00` : `${timeslot.toString()}:00`;
   }
 
-  const formatDateToYYYYMMDD = (date:Date) => {
+  const formatDateToYYYYMMDD = (date: Date) => {
     return date ? date.toString().split("T")[0] : ""
   }
 
@@ -80,7 +78,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
     return response.data;
   };
 
-  const { mutate: createMutation, isLoading: isLoadingCreation } = useMutation(createBooking, {
+  const { mutate: createMutation } = useMutation(createBooking, {
     onSuccess: data => {
       console.log(data);
       const message = "Booking created"
@@ -92,7 +90,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
     }
   });
 
-  const { mutate: updateMutation, isLoading: isLoadingMod } = useMutation(modifyBooking, {
+  const { mutate: updateMutation } = useMutation(modifyBooking, {
     onSuccess: data => {
       console.log(data);
       const message = "Booking created"
@@ -124,7 +122,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
     setBookingFormState({});
     setShowModal(false);
   }
-  console.log("Date!!!",bookingFormState);
+  console.log("Date!!!", bookingFormState);
   return (
     <>
       {status === "loading" ? (
@@ -166,7 +164,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
             </tbody>
           </Table>
 
-          
+
           <Modal show={showModal} onHide={handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>Update booking</Modal.Title>
@@ -185,8 +183,12 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
 
                 <Form.Group className="mb-3" controlId="timeslot">
                   <Form.Label>Timeslot</Form.Label>
-                  <Form.Control name="timeslot" type="number" onChange={handleChange} value={bookingFormState.timeslot} />
-                </Form.Group>
+                  <Form.Select required name="timeslot" onChange={handleChange} value={bookingFormState.timeslot}>
+                    {[...Array(24)].map((x, i) =>
+                      i < 10 ? <option value={i}>0{i}:00</option> : <option value={i}>{i}:00</option>
+                    )}
+                  </Form.Select>                
+                  </Form.Group>
 
                 <Form.Group className="mb-3" controlId="customer_nr">
                   <Form.Label>Number of customers</Form.Label>

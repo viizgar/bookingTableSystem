@@ -1,10 +1,7 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { Button, Form, Table } from "react-bootstrap";
-import { useQuery } from "react-query";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Button, Form } from "react-bootstrap";
 import axiosClient from "../../axios";
-import { useForm } from "react-hook-form";
 import { useMutation } from 'react-query';
 import Restaurant from "../../types/Restaurant";
 
@@ -23,7 +20,7 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
     return response.data;
   };
 
-  const { mutate: createMutation, isLoading: isLoadingCreation } = useMutation(createRestaurant, {
+  const { mutate: createMutation } = useMutation(createRestaurant, {
     onSuccess: data => {
       console.log(data);
       const message = "Restaurant created"
@@ -34,7 +31,7 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
     }
   });
 
-  const { mutate: updateMutation, isLoading: isLoadingUpload } = useMutation(updateRestaurant, {
+  const { mutate: updateMutation } = useMutation(updateRestaurant, {
     onSuccess: data => {
       console.log(data);
       const message = "Restaurant modified"
@@ -65,8 +62,6 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
     }
 
   }
-
-  const onErrors = (errors: any) => console.error(errors);
 
   return (
     <div className="restaurantForm">

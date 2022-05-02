@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
@@ -16,7 +15,7 @@ function useRestaurants() {
 
 export default function RestaurantTable() {
 
-    const { status, data, error, isFetching } = useRestaurants();
+    const { status, data } = useRestaurants();
 
     return (
         <>

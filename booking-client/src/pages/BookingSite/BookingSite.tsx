@@ -1,8 +1,6 @@
 import * as React from "react";
-import { Link, Outlet, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import BookingTable from "../../components/BookingTable/BookingTable";
-import RestaurantInfoForm from "../../components/RestaurantInfoForm/RestaurantInfoForm";
-import RestaurantTable from "../../components/RestaurantTable/RestaurantTable";
 
 export default function BookingSite() {
     const { id } = useParams()

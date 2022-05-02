@@ -1,11 +1,8 @@
 import * as React from "react";
-import { useState } from "react";
 import { useQuery } from "react-query";
-import { Link, Outlet, useParams } from "react-router-dom";
-import Restaurant from "../../types/Restaurant";
+import { useParams } from "react-router-dom";
 import axiosClient from "../../axios";
 import RestaurantInfoForm from "../../components/RestaurantInfoForm/RestaurantInfoForm";
-import BookingTable from "../../components/BookingTable/BookingTable";
 
 function useRestaurant(id: string | undefined) {
   return useQuery("restaurant", async () => {
@@ -18,7 +15,7 @@ function useRestaurant(id: string | undefined) {
 
 export default function RestaurantAdmin() {
   const { id } = useParams()
-  const { status, data, error, isFetching } = useRestaurant(id);
+  const { status, data} = useRestaurant(id);
 
   return (
     <>
