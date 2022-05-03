@@ -46,7 +46,7 @@ export class BookingsService {
 
   async findMany(restaurant: string, date?: string, timeslot?: Number): Promise<Booking[]> {
     if (!(await this.validateRestaurantReference(restaurant))) {
-      throw Error("Invalid Restaurant id");
+      return null // Bad ids will not be found on DB but should not throw errors
     };
 
     const filter: { [k: string]: any } = { restaurant: restaurant };
@@ -69,7 +69,7 @@ export class BookingsService {
 
   async findFullyBookedSlots(restaurant: string, date: string): Promise<Number[]> {
     if (!(await this.validateRestaurantReference(restaurant))) {
-      throw Error("Invalid Restaurant id");
+      return null // Bad ids will not be found on DB but should not throw errors
     };
     
     const dateObj = this.parseDateStringToDateObject(date);
@@ -91,11 +91,15 @@ export class BookingsService {
       agg.forEach((value: any) => {
         const { _id, bookings } = value;
         const timeslot: any = _id;
+        console.log("value.bookings", value.bookings);
+        console.log("timeslot", timeslot);
 
         if (value.bookings >= total_tables) {
           fullyBookedSlots.push(timeslot);
         }
       })
+      console.log("fullyBookedSlots", fullyBookedSlots);
+
     }
 
     return fullyBookedSlots;
@@ -104,22 +108,25 @@ export class BookingsService {
 
   async findOne(id: string): Promise<Booking> {
     if (!ObjectId.isValid(id)) {
-      throw Error("Invalid Booking ID");
+      return null // Bad ids will not be found on DB but should not throw errors
     };
     return this.bookingModel.findOne({ _id: id }).exec();
   }
 
   async update(id: string, updateBookingDto: UpdateBookingDto): Promise<Booking> {
     if (!ObjectId.isValid(id)) {
-      throw Error("Invalid Booking ID")
+      return null // Bad ids will not be found on DB but should not throw errors
     };
 
     // Validators
 
     // Only attempts within the restaurant working hours are accepted
     const originalBooking: Booking = await this.bookingModel.findById(id).exec();
-    console.log("originalBooking",originalBooking);
-    console.log("updateBookingDto",updateBookingDto);
+
+    // Booking not exists
+    if(originalBooking === null){
+      return null;
+    }
 
     if (updateBookingDto.timeslot && !await this.isRestaurantOpen(originalBooking.restaurant, updateBookingDto.timeslot)) {
       throw Error("Restaurant closed");
@@ -132,14 +139,17 @@ export class BookingsService {
 
     const modBooking = await this.bookingModel.findByIdAndUpdate(id, updateBookingDto, { new: true }).exec();
 
+    // on success
+    if(modBooking){
     //In case the date or timeslot changes and it was full, a non-confirmed booking can take its place
     this.placePendingBooking(modBooking.restaurant, modBooking.date, modBooking.timeslot);
+    }
     return modBooking;
   }
 
   async delete(id: string) {
     if (!ObjectId.isValid(id)) {
-      throw Error("Invalid Booking ID");
+      return null // Bad ids will not be found on DB but should not throw errors
     };
 
     const deletedBooking = await this.bookingModel
@@ -153,6 +163,7 @@ export class BookingsService {
 
   // helpers
   async validateRestaurantReference(restaurant: string): Promise<Boolean> {
+    console.log("restaurant", restaurant);
     if (ObjectId.isValid(restaurant)) {
       if (await this.restaurantModel.findById(restaurant)) {
         return true;
@@ -173,9 +184,6 @@ export class BookingsService {
   }
 
   async isRestaurantOpen(restaurant: String, timeslot: number): Promise<Boolean> {
-    const test = await this.restaurantModel.findById(restaurant);
-    console.log("test", test);
-    console.log("restaurant", restaurant);
     const { opening_hour, closing_hour } = await this.restaurantModel.findById(restaurant);
     return timeslot >= opening_hour && timeslot <= closing_hour;
   }

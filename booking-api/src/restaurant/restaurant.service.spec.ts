@@ -9,7 +9,7 @@ const mockRte = {
   owner: 'Mr Testar',
   opening_hour: 9,
   closing_hour: 20,
-  total_tables: 10
+  total_tables: 10,
 };
 
 const mockModRte = {
@@ -17,8 +17,8 @@ const mockModRte = {
   owner: 'owner',
   opening_hour: 9,
   closing_hour: 20,
-  total_tables: 10
-}
+  total_tables: 10,
+};
 
 describe('RestaurantService', () => {
   let service: RestaurantService;
@@ -30,14 +30,14 @@ describe('RestaurantService', () => {
       owner: 'Mr Testar',
       opening_hour: 9,
       closing_hour: 20,
-      total_tables: 10
+      total_tables: 10,
     },
     {
       name: 'Restaurant #test2',
       owner: 'Ms Testi',
       opening_hour: 9,
       closing_hour: 12,
-      total_tables: 5
+      total_tables: 5,
     },
   ];
 
@@ -69,101 +69,111 @@ describe('RestaurantService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return all restaurants', async () => {
-    jest.spyOn(model, 'find').mockReturnValue({
-      exec: jest.fn().mockResolvedValueOnce(rteArray),
-    } as any);
-    const rtes = await service.findAll();
-    expect(rtes).toEqual(rteArray);
-  });
-
-  it('should return a single restaurant by id', async () => {
-    jest.spyOn(model, 'findOne').mockReturnValue({
-      exec: jest.fn().mockResolvedValueOnce(rteArray[0]),
-    } as any);
-    const rte = await service.findOne("626d48eeb97e6bbcf0dddf22");
-    expect(rte).toEqual(rteArray[0]);
-  });
-
-
-  it('should insert a new restaurant', async () => {
-    jest.spyOn(model, 'create').mockImplementationOnce(() =>
-      Promise.resolve(mockRte),
-    );
-    const newRte = await service.create({
-      name: 'new restaurant',
-      owner: 'owner',
-      opening_hour: 9,
-      closing_hour: 20,
-      total_tables: 10
+  describe('find Many', () => {
+    it('should return all restaurants', async () => {
+      jest.spyOn(model, 'find').mockReturnValue({
+        exec: jest.fn().mockResolvedValueOnce(rteArray),
+      } as any);
+      const rtes = await service.findAll();
+      expect(rtes).toEqual(rteArray);
     });
-    expect(newRte).toEqual(mockRte);
   });
 
-  it('should fail to insert a new bad format restaurant', async () => {
-    jest.spyOn(model, 'create').mockImplementationOnce(() =>
-      Promise.reject(new Error('incorrect model')),
-    );
-    const newRte = await service.create({
-      name: 'new restaurant',
-      owner: 'owner'
-    } as any);
-    expect(newRte).toEqual(null);
-  });
-
-  it('should update a restaurant', async () => {
-    jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
-      exec: jest.fn().mockResolvedValueOnce(mockModRte),
-    } as any);
-    const modRte = await service.update("626d48eeb97e6bbcf0dddf22", {
-      name: 'mod restaurant',
-      owner: 'owner',
-      opening_hour: 9,
-      closing_hour: 20,
-      total_tables: 10
+  describe('find Unique', () => {
+    it('should return a single restaurant by id', async () => {
+      jest.spyOn(model, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValueOnce(rteArray[0]),
+      } as any);
+      const rte = await service.findOne('626d48eeb97e6bbcf0dddf22');
+      expect(rte).toEqual(rteArray[0]);
     });
-    expect(modRte).toEqual(mockModRte);
   });
 
-  it('should fail to update with a bad restaurant model', async () => {
-    jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
-      exec: jest.fn().mockResolvedValueOnce(null),
-    } as any);
-    const modRte = await service.update("626d48eeb97e6bbcf0dddf22", {
-      name: 'mod restaurant',
-      owner: 'owner',
-      opening_hour: 9,
-      closing_hour: 20,
-      total_tables: 10
-    });
-    expect(modRte).toEqual(null);
-  });
-
-  it("Should not update unexistant restaurant", async () => {
-    jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
-      exec: jest.fn().mockResolvedValueOnce(null),
-    } as any);
-    const modRte = await service.update("626d48eeb97e6bbcf0dddf22", {
-      name: 'mod restaurant',
-      owner: 'owner',
-      opening_hour: 9,
-      closing_hour: 20,
-      total_tables: 10
+  describe('creation', () => {
+    it('should insert a new restaurant', async () => {
+      jest
+        .spyOn(model, 'create')
+        .mockImplementationOnce(() => Promise.resolve(mockRte));
+      const newRte = await service.create({
+        name: 'new restaurant',
+        owner: 'owner',
+        opening_hour: 9,
+        closing_hour: 20,
+        total_tables: 10,
+      });
+      expect(newRte).toEqual(mockRte);
     });
 
-    expect(modRte).toBeNull();
+    it('should fail to insert a new bad format restaurant', async () => {
+      jest
+        .spyOn(model, 'create')
+        .mockImplementationOnce(() =>
+          Promise.reject(new Error('incorrect model')),
+        );
+      const newRte = await service.create({
+        name: 'new restaurant',
+        owner: 'owner',
+      } as any);
+      expect(newRte).toEqual(null);
+    });
   });
 
-  it('should delete a restaurant', async () => {
-    jest.spyOn(model, 'findByIdAndRemove').mockReturnValue({
-      exec: jest.fn().mockResolvedValueOnce(mockModRte),
-    } as any);
-    const deletedRte = await service.delete("626d48eeb97e6bbcf0dddf22");
-    expect(deletedRte).toEqual(mockModRte);
+  describe('update', () => {
+    it('should update a restaurant', async () => {
+      jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
+        exec: jest.fn().mockResolvedValueOnce(mockModRte),
+      } as any);
+      const modRte = await service.update('626d48eeb97e6bbcf0dddf22', {
+        name: 'mod restaurant',
+        owner: 'owner',
+        opening_hour: 9,
+        closing_hour: 20,
+        total_tables: 10,
+      });
+      expect(modRte).toEqual(mockModRte);
+    });
+
+    it('should fail to update with a bad restaurant model', async () => {
+      jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
+        exec: jest.fn().mockResolvedValueOnce(null),
+      } as any);
+      const modRte = await service.update('626d48eeb97e6bbcf0dddf22', {
+        name: 'mod restaurant',
+        owner: 'owner',
+        opening_hour: 9,
+        closing_hour: 20,
+        total_tables: 10,
+      });
+      expect(modRte).toEqual(null);
+    });
+
+    it('Should not update unexistant restaurant', async () => {
+      jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
+        exec: jest.fn().mockResolvedValueOnce(null),
+      } as any);
+      const modRte = await service.update('626d48eeb97e6bbcf0dddf22', {
+        name: 'mod restaurant',
+        owner: 'owner',
+        opening_hour: 9,
+        closing_hour: 20,
+        total_tables: 10,
+      });
+
+      expect(modRte).toBeNull();
+    });
   });
 
-  it('should throw error to a bad formed id', async () => {
-    expect(service.delete("fakeId")).rejects.toBeInstanceOf(
-      Error);
+  describe('delete', () => {
+    it('should delete a restaurant', async () => {
+      jest.spyOn(model, 'findByIdAndRemove').mockReturnValue({
+        exec: jest.fn().mockResolvedValueOnce(mockModRte),
+      } as any);
+      const deletedRte = await service.delete('626d48eeb97e6bbcf0dddf22');
+      expect(deletedRte).toEqual(mockModRte);
+    });
+
+    it('should throw error to a bad formed id', async () => {
+      expect(service.delete('fakeId')).resolves.toBeNull();
+    });
   });
 });
