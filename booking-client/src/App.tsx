@@ -1,25 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './App.scss';
+import { Route, Routes } from 'react-router-dom';
+import NavigationMenu from './components/NavigationMenu/NavigationMenu';
+import NotFound from './pages/NotFound/NotFound';
+import FrontPage from './pages/FrontPage/FrontPage';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import RestaurantAdmin from './pages/RestaurantAdmin/RestaurantAdmin';
+import BookingSite from './pages/BookingSite/BookingSite';
+const queryClient = new QueryClient();
 
 function App() {
   return (
+    <QueryClientProvider client={queryClient}>
+
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Routes>
+        <Route path="/" element={<NavigationMenu />}>
+          <Route index element={<FrontPage />} />
+          <Route path="/admin/:id" element={<RestaurantAdmin />} />
+        <Route path="/bookings/:id" element={<BookingSite />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+        
+      </Routes>
     </div>
+    </QueryClientProvider>
+
   );
 }
 

@@ -1,10 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { RestaurantModule } from './restaurant/restaurant.module';
+import { BookingsModule } from './bookings/bookings.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    MongooseModule.forRoot(process.env.DB_URL, {
+        authSource: "admin",
+        user: process.env.DB_USER,
+        pass: process.env.DB_PWD
+    }),
+    RestaurantModule,
+    BookingsModule,
+  ],
 })
 export class AppModule {}

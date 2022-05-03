@@ -10,13 +10,14 @@ services:
             dockerfile: ./Dockerfile
         volumes:
             - ./booking-client:/usr/src/app
-            - /usr/src/app/node_modules
+            - front_node_modules:/usr/src/app/node_modules
         ports:
             - 3000:3000
         networks:
             - app-network
         environment:
             - NODE_ENV=development
+            - REACT_APP_API_URL=http://localhost:8080/
     
     api:
         container_name: api
@@ -33,11 +34,13 @@ services:
             - app-network
         volumes:
             - ./booking-api:/usr/src/app
-            - /usr/src/app/node_modules
+            - api_node_modules:/usr/src/app/node_modules
         depends_on:
             - db
         environment:
-            - DATABASE_URL=mongodb://root:restaurant@mongo:27017/
+            - DB_URL=mongodb://db:27017
+            - DB_USER=admin
+            - DB_PWD=admin123
             - NODE_ENV=development
         restart: unless-stopped
     
@@ -47,9 +50,12 @@ services:
         restart: always
         volumes: 
             - db-volume:/data/db
+        networks:
+            - app-network
         environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: restaurant
+            MONGO_INITDB_ROOT_USERNAME: admin
+            MONGO_INITDB_ROOT_PASSWORD: admin123
+            MONGO_INITDB_DATABASE: bookingtabledb
 
     db-admin:
         container_name: db-admin
@@ -59,16 +65,20 @@ services:
             - 8081:8081
         depends_on:
             - db
+        networks:
+            - app-network
         environment:
-            ME_CONFIG_MONGODB_ADMINUSERNAME: root
-            ME_CONFIG_MONGODB_ADMINPASSWORD: restaurant
+            ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+            ME_CONFIG_MONGODB_ADMINPASSWORD: admin123
             ME_CONFIG_MONGODB_SERVER: db
             ME_CONFIG_MONGODB_ENABLE_ADMIN: true
-            ME_CONFIG_BASICAUTH_USERNAME: admin
-            ME_CONFIG_BASICAUTH_PASSWORD: admin
+            ME_CONFIG_BASICAUTH_USERNAME: memongo
+            ME_CONFIG_BASICAUTH_PASSWORD: memongo
 networks:
     app-network:
 
 volumes:
   db-volume:
+  front_node_modules:
+  api_node_modules:
     
