@@ -46,7 +46,7 @@ export class BookingsService {
 
   async findMany(restaurant: string, date?: string, timeslot?: Number): Promise<Booking[]> {
     if (!(await this.validateRestaurantReference(restaurant))) {
-      return null // Bad ids will not be found on DB but should not throw errors
+      return [] // Bad ids will not be found on DB but should not throw errors
     };
 
     const filter: { [k: string]: any } = { restaurant: restaurant };

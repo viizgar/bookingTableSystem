@@ -60,7 +60,8 @@ export class BookingsController {
     try{
       return await this.bookingsService.findFullyBookedSlots(restaurant, date);
     }catch(e){
-      throw new BadRequestException(e.message);
+      // If params are incorrect 404 is returned (no resources found with inputed params)
+      throw new NotFoundException(e.message);
     }
     
   }
@@ -79,7 +80,7 @@ export class BookingsController {
     try{
       return await this.bookingsService.delete(id);
     }catch(e){
-      throw new BadRequestException(e.message);
+      return null;
     }
   }
 }
