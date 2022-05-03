@@ -12,16 +12,24 @@ export class RestaurantController {
 
   @Post()
   async create(@Body() createRestaurantDto: CreateRestaurantDto) {
-    const res = await this.restaurantService.create(createRestaurantDto);
-    if(res === null) { throw new BadRequestException() };
-    return res;
+    try{
+      return await this.restaurantService.create(createRestaurantDto);
+    }catch(e){
+      throw new BadRequestException(e.message);
+    }
   }
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() modifyRestaurantDto: ModifyRestaurantDto) {
-    const res = await this.restaurantService.update(id, modifyRestaurantDto);
-    if(res === null) { throw new NotFoundException() };
-    return res;
+    try{
+      const res =  await this.restaurantService.update(id, modifyRestaurantDto);
+      if(res === null) { throw new NotFoundException() };
+      return res;
+    }catch(e){
+      if(e instanceof NotFoundException ) {
+        throw e};
+      throw new BadRequestException(e.message);
+    }
   }
 
   @Get()
@@ -31,14 +39,17 @@ export class RestaurantController {
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Restaurant> {
+    try{
     const res = await this.restaurantService.findOne(id);
-    console.log(res);
     if(res === null) { throw new NotFoundException() };
     return res;
+  }catch(e){
+    throw new NotFoundException()
+  }
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    return this.restaurantService.delete(id);
+    return await this.restaurantService.delete(id); 
   }
 }

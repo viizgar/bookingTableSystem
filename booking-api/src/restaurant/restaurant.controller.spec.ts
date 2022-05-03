@@ -76,14 +76,16 @@ describe('Restaurant Controller', () => {
       expect(service.create).toHaveBeenCalledWith(restaurantDto);
     });
 
+    
     it('should fail to create a new restaurant with bad model', async () => {
       jest.spyOn(service, 'create').mockResolvedValue(null);
 
-      expect(controller.create({
+      expect(await controller.create({
         name: 'Restaurant #test',
-        owner: 'Mr Testar'
-      } as any)).rejects.toBeInstanceOf(
-        BadRequestException);
+        owner: 'Mr Testar',
+        opening_hour: 10,
+        closing_hour: 9
+      } as any)).toBeNull()
       expect(service.create).toHaveBeenCalled();
     });
   });
@@ -123,9 +125,10 @@ describe('Restaurant Controller', () => {
       expect(service.findOne).toHaveBeenCalled();
     });
 
-    it('should fail with a non existing restaurant id', async () => {
+    
+    it('should fail (NotFoundException) with a non existing restaurant id', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValue(null);
-      expect(controller.findOne("fakeId")).rejects.toBeInstanceOf(
+      expect( controller.findOne("fakeId")).rejects.toBeInstanceOf(
         NotFoundException);
       expect(service.findOne).toHaveBeenCalled();
     });
@@ -146,10 +149,18 @@ describe('Restaurant Controller', () => {
       expect(service.update).toHaveBeenCalled();
     });
 
-    it('should reject to update a non existing restaurant', async () => {
+    
+    it('should reject (NotFoundException 404) to update a non existing restaurant', async () => {
       jest.spyOn(service, 'update').mockResolvedValue(null);
-      expect(controller.update("fakeId", restaurantDto)).rejects.toBeInstanceOf(
+      expect( controller.update("626d48eeb97e6bbcf0dddf22", restaurantDto)).rejects.toBeInstanceOf(
         NotFoundException);
+      expect(service.update).toHaveBeenCalled();
+    });
+
+    it('should reject (NotFoundException 409) to update a non existing restaurant', async () => {
+      jest.spyOn(service, 'update').mockRejectedValue(new Error("BadId"));
+      expect( controller.update("badId", restaurantDto)).rejects.toBeInstanceOf(
+        BadRequestException);
       expect(service.update).toHaveBeenCalled();
     });
   });

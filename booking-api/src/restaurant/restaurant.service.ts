@@ -14,6 +14,7 @@ export class RestaurantService {
 
   async create(createRestaurantDto: CreateRestaurantDto): Promise<Restaurant> {
     try {
+      this.validateRestaurantDto(createRestaurantDto);
       const createdRte = await this.restaurantModel.create(createRestaurantDto);
       console.log(createdRte);
       return createdRte;
@@ -24,9 +25,9 @@ export class RestaurantService {
 
   async update(id: string, modifyRestaurantDto: ModifyRestaurantDto): Promise<Restaurant> {
     if (!ObjectId.isValid(id)) {
-      return null;
+      throw Error("Invalid Restaurant ID");
     };
-
+    this.validateRestaurantDto(modifyRestaurantDto);
     const modRte = await this.restaurantModel.findByIdAndUpdate(id, modifyRestaurantDto, { new: true }).exec();
     return modRte;
   }
@@ -37,19 +38,31 @@ export class RestaurantService {
 
   async findOne(id: string): Promise<Restaurant> {
     if (!ObjectId.isValid(id)) {
-      return null;
+      throw Error("Invalid Restaurant ID");
     };
-    return this.restaurantModel.findOne({ _id: id }).exec();
+    const found = await this.restaurantModel.findOne({ _id: id }).exec();
+    console.log("findOne",found);
+    return found;
   }
 
   async delete(id: string) {
     if (!ObjectId.isValid(id)) {
-      return null;
+      return null; // nothing valid to delete
     };
     
     const deletedRte = await this.restaurantModel
       .findByIdAndRemove({ _id: id })
       .exec();
     return deletedRte;
+  }
+
+  // Logic backend validations on the Restaurant object before saving to the database
+  validateRestaurantDto = (restaurant: CreateRestaurantDto | ModifyRestaurantDto) =>{
+    if(restaurant.opening_hour > restaurant.closing_hour){
+      throw Error("Opening hour cannot be after the closing hour");
+    }
+    if(restaurant.total_tables < 0){
+      throw Error("Number of tables needs to be a positive number");
+    }
   }
 }

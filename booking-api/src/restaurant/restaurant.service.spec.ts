@@ -127,7 +127,7 @@ describe('RestaurantService', () => {
 
   it('should fail to update with a bad restaurant model', async () => {
     jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
-      exec: jest.fn().mockResolvedValueOnce(mockModRte),
+      exec: jest.fn().mockResolvedValueOnce(null),
     } as any);
     const modRte = await service.update("626d48eeb97e6bbcf0dddf22", {
       name: 'mod restaurant',
@@ -136,14 +136,14 @@ describe('RestaurantService', () => {
       closing_hour: 20,
       total_tables: 10
     });
-    expect(modRte).toEqual(mockModRte);
+    expect(modRte).toEqual(null);
   });
 
   it("Should not update unexistant restaurant", async () => {
     jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
       exec: jest.fn().mockResolvedValueOnce(null),
     } as any);
-    const modRte = await service.update("fakeId", {
+    const modRte = await service.update("626d48eeb97e6bbcf0dddf22", {
       name: 'mod restaurant',
       owner: 'owner',
       opening_hour: 9,
@@ -162,9 +162,8 @@ describe('RestaurantService', () => {
     expect(deletedRte).toEqual(mockModRte);
   });
 
-  it('should return null to a bad formed id', async () => {
-    const deletedRte = await service.delete("fakeId");
-    expect(deletedRte).toBeNull();
+  it('should throw error to a bad formed id', async () => {
+    expect(service.delete("fakeId")).rejects.toBeInstanceOf(
+      Error);
   });
-
 });

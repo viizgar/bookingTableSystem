@@ -6,7 +6,6 @@ import { Booking, BookingDocument } from './schemas/booking.schema';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { Restaurant, RestaurantDocument } from "src/restaurant/schemas/restaurant.schema";
-import { ModifyRestaurantDto } from 'src/restaurant/dto/modify-restaurant.dto';
 
 
 @Injectable()
