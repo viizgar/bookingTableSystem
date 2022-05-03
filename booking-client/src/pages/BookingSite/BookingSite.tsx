@@ -4,7 +4,6 @@ import BookingTable from "../../components/BookingTable/BookingTable";
 
 export default function BookingSite() {
     const { id } = useParams()
-    console.log(id)
 
     return (
         <div className="adminPanelWrapper">

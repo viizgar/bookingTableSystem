@@ -22,23 +22,21 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
 
   const { mutate: createMutation } = useMutation(createRestaurant, {
     onSuccess: data => {
-      console.log(data);
       const message = "Restaurant created"
       alert(message);
     },
-    onError: () => {
-      alert("there was an error")
+    onError: (e: any) => {
+      alert("there was an error: "+e.response.data.message);
     }
   });
 
   const { mutate: updateMutation } = useMutation(updateRestaurant, {
     onSuccess: data => {
-      console.log(data);
       const message = "Restaurant modified"
       alert(message);
     },
-    onError: () => {
-      alert("there was an error")
+    onError: (e: any) => {
+      alert("there was an error:"+e.response.data.message);
     }
   });
 
@@ -50,7 +48,6 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
 
   const onFormSubmit = (event: any) => {
     event.preventDefault();
-    console.log(restaurantFormState);
     //Update
     if (props.restaurant._id) {
       updateMutation(restaurantFormState);

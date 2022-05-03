@@ -110,11 +110,11 @@ describe('RestaurantService', () => {
         .mockImplementationOnce(() =>
           Promise.reject(new Error('incorrect model')),
         );
-      const newRte = await service.create({
+     
+      expect(service.create({
         name: 'new restaurant',
         owner: 'owner',
-      } as any);
-      expect(newRte).toEqual(null);
+      } as any)).rejects.toBeInstanceOf(Error);
     });
   });
 

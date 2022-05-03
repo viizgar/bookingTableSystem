@@ -91,14 +91,11 @@ export class BookingsService {
       agg.forEach((value: any) => {
         const { _id, bookings } = value;
         const timeslot: any = _id;
-        console.log("value.bookings", value.bookings);
-        console.log("timeslot", timeslot);
 
         if (value.bookings >= total_tables) {
           fullyBookedSlots.push(timeslot);
         }
       })
-      console.log("fullyBookedSlots", fullyBookedSlots);
 
     }
 
@@ -163,7 +160,6 @@ export class BookingsService {
 
   // helpers
   async validateRestaurantReference(restaurant: string): Promise<Boolean> {
-    console.log("restaurant", restaurant);
     if (ObjectId.isValid(restaurant)) {
       if (await this.restaurantModel.findById(restaurant)) {
         return true;
@@ -174,7 +170,6 @@ export class BookingsService {
 
   parseDateStringToDateObject(dateString: string): Date {
     const dateObj = new Date(dateString);
-    console.log(dateObj);
     if (dateObj instanceof Date && isNaN(dateObj.valueOf())) {
       //invalid date
       throw Error("invalid date")

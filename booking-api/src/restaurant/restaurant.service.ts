@@ -13,14 +13,10 @@ export class RestaurantService {
   ) { }
 
   async create(createRestaurantDto: CreateRestaurantDto): Promise<Restaurant> {
-    try {
       this.validateRestaurantDto(createRestaurantDto);
       const createdRte = await this.restaurantModel.create(createRestaurantDto);
-      console.log(createdRte);
       return createdRte;
-    } catch (e) {
-      return null;
-    }
+    
   }
 
   async update(id: string, modifyRestaurantDto: ModifyRestaurantDto): Promise<Restaurant> {
@@ -41,7 +37,6 @@ export class RestaurantService {
       throw Error("Invalid Restaurant ID");
     };
     const found = await this.restaurantModel.findOne({ _id: id }).exec();
-    console.log("findOne",found);
     return found;
   }
 
@@ -58,8 +53,8 @@ export class RestaurantService {
 
   // Logic backend validations on the Restaurant object before saving to the database
   validateRestaurantDto = (restaurant: CreateRestaurantDto | ModifyRestaurantDto) =>{
-    if(restaurant.opening_hour > restaurant.closing_hour){
-      throw Error("Opening hour cannot be after the closing hour");
+    if(restaurant.opening_hour >= restaurant.closing_hour){
+      throw Error("Opening hour cannot be equals or after the closing hour");
     }
     if(restaurant.total_tables < 0){
       throw Error("Number of tables needs to be a positive number");

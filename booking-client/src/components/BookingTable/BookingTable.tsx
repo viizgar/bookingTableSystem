@@ -28,22 +28,19 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
 
   const { mutate } = useMutation(deleteBooking, {
     onSuccess: (res: any) => {
-      console.log(res);
       const message = "Booking deleted successfuly"
       alert(message);
     },
-    onError: () => {
-      alert("there was an error")
+    onError: (e : any) => {
+      alert("there was an error:"+e.response.data.message);
     }
   });
 
   const handleCreation = (restaurantId: string) => {
-    console.log(restaurantId);
     setShowModal(true);
     setBookingFormState({ restaurant: restaurantId });
   }
   const handleUpdate = (booking: Booking) => {
-    console.log("Update booking", booking);
     setShowModal(true);
     setBookingFormState(booking);
   }
@@ -51,7 +48,6 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
   const handleClose = () => {
     setShowModal(false);
     setBookingFormState({});
-    console.log("After close", bookingFormState)
   }
 
   const handleDelete = (id: string) => {
@@ -73,31 +69,28 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
   };
 
   const modifyBooking = async (data: Booking) => {
-    console.log(data);
     const { data: response } = await axiosClient.put('/bookings/' + bookingFormState._id, data);
     return response.data;
   };
 
   const { mutate: createMutation } = useMutation(createBooking, {
     onSuccess: data => {
-      console.log(data);
       const message = "Booking created"
       alert(message);
 
     },
-    onError: () => {
-      alert("there was an error")
+    onError: (e : any) => {
+      alert("there was an error:"+e.response.data.message);
     }
   });
 
   const { mutate: updateMutation } = useMutation(modifyBooking, {
     onSuccess: data => {
-      console.log(data);
       const message = "Booking created"
       alert(message);
     },
-    onError: () => {
-      alert("there was an error")
+    onError: (e : any) => {
+      alert("there was an error:"+e.response.data.message);
     }
   });
 
@@ -109,20 +102,17 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
 
   const onFormSubmit = (event: any) => {
     event.preventDefault();
-    console.log(bookingFormState);
     //Update
     if (bookingFormState._id) {
       updateMutation(bookingFormState);
     } else {
       //Create new
       const newBooking = { ...bookingFormState, restaurant: restaurantId }
-      console.log(newBooking)
       createMutation(newBooking as any);
     }
     setBookingFormState({});
     setShowModal(false);
   }
-  console.log("Date!!!", bookingFormState);
   return (
     <>
       {status === "loading" ? (
