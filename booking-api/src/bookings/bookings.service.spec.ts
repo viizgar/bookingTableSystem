@@ -30,7 +30,7 @@ const mockValidBooking = {
 
 const mockValidBookingArray = [
   { ...mockValidBooking },
-  { ...mockValidBooking, client_name: 'Client #2' },
+  { ...mockValidBooking, client_name: 'Client #2', _id: "626f9547ce9c7383a490f78l" },
 ];
 
 const mockBadBooking = {
