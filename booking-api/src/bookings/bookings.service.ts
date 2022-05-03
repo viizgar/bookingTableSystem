@@ -6,6 +6,7 @@ import { Booking, BookingDocument } from './schemas/booking.schema';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { Restaurant, RestaurantDocument } from "src/restaurant/schemas/restaurant.schema";
+import { isModuleNamespaceObject } from 'util/types';
 
 
 @Injectable()
@@ -79,9 +80,9 @@ export class BookingsService {
 
     if (hourlySlots > 0) {
       const agg = await this.bookingModel.aggregate([
-        {
-          $group: {
-            _id: { 'date': '$date', 'timeslot': '$timeslot' },
+        { $match : { date : new Date(date) } } ,
+          {$group: {
+            _id: '$timeslot',
             bookings: { "$sum": 1 }
           }
         }
@@ -89,7 +90,7 @@ export class BookingsService {
 
       agg.forEach((value: any) => {
         const { _id, bookings } = value;
-        const timeslot: any = _id.timeslot;
+        const timeslot: any = _id;
 
         if (value.bookings >= total_tables) {
           fullyBookedSlots.push(timeslot);
@@ -207,3 +208,4 @@ export class BookingsService {
   }
 
 }
+
