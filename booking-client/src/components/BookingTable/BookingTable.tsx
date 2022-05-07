@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Button, ButtonGroup, Form, Modal, Table } from "react-bootstrap";
+import { Button, ButtonGroup, Form, Modal, Table, Toast, ToastContainer } from "react-bootstrap";
 import { useMutation, useQuery } from "react-query";
 import axiosClient from "../../axios";
 import Booking from "../../types/Booking";
@@ -19,22 +19,10 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
   const { status, data } = useBookings(restaurantId);
 
   const [showModal, setShowModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastBody, setToastBody] = useState("default");
+
   const [bookingFormState, setBookingFormState] = useState({} as any);
-
-  const deleteBooking = async (id: string) => {
-    const { data: response } = await axiosClient.delete('/bookings/' + id);
-    return response.data;
-  };
-
-  const { mutate } = useMutation(deleteBooking, {
-    onSuccess: (res: any) => {
-      const message = "Booking deleted successfuly"
-      alert(message);
-    },
-    onError: (e : any) => {
-      alert("there was an error:"+e.response.data.message);
-    }
-  });
 
   const handleCreation = (restaurantId: string) => {
     setShowModal(true);
@@ -51,7 +39,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
   }
 
   const handleDelete = (id: string) => {
-    mutate(id);
+    deleteMutation(id);
   }
 
   const formatTimeslotToHour = (timeslot: number) => {
@@ -62,35 +50,53 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
     return date ? date.toString().split("T")[0] : ""
   }
 
-
-  const createBooking = async (data: Booking) => {
-    const { data: response } = await axiosClient.post('/bookings', data);
-    return response.data;
+  const createBooking = async (booking: Booking) => {
+    const { data } = await axiosClient.post('/bookings', booking);
+    return data;
   };
 
-  const modifyBooking = async (data: Booking) => {
-    const { data: response } = await axiosClient.put('/bookings/' + bookingFormState._id, data);
-    return response.data;
+  const modifyBooking = async (booking: Booking) => {
+    const { data } = await axiosClient.put('/bookings/' + bookingFormState._id, booking);
+    return data;
   };
+
+  const deleteBooking = async (id: string) => {
+    const { data } = await axiosClient.delete('/bookings/' + id);
+    return data;
+  };
+
+  const { mutate: deleteMutation } = useMutation(deleteBooking, {
+    onSuccess: (res: any) => {
+      const message = "Booking deleted successfuly"
+      delete data[data.findIndex((e: Booking) => e._id === res._id)];
+      toogleToast(message);
+    },
+    onError: (e: any) => {
+      alert("there was an error:" + e.response.data.message);
+    }
+  });
 
   const { mutate: createMutation } = useMutation(createBooking, {
-    onSuccess: data => {
-      const message = "Booking created"
-      alert(message);
-
+    onSuccess: (res: Booking) => {
+      const message = "Booking creasted"
+      toogleToast(message);
+      data.push(res)
     },
-    onError: (e : any) => {
-      alert("there was an error:"+e.response.data.message);
+    onError: (e: any) => {
+      alert("there was an error:" + e.response.data.message);
     }
   });
 
   const { mutate: updateMutation } = useMutation(modifyBooking, {
-    onSuccess: data => {
+    onSuccess: (res: Booking) => {
       const message = "Booking created"
-      alert(message);
+      data[data.findIndex((e: Booking) => e._id === res._id)] = { ...res };
+      toogleToast(message);
+      console.log(data);
+
     },
-    onError: (e : any) => {
-      alert("there was an error:"+e.response.data.message);
+    onError: (e: any) => {
+      alert("there was an error:" + e.response.data.message);
     }
   });
 
@@ -113,6 +119,17 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
     setBookingFormState({});
     setShowModal(false);
   }
+
+  const toogleToast = (text?: string) => {
+    if (showToast) {
+      setToastBody("");
+      setShowToast(false);
+    } else {
+      setToastBody(text ? text : "No text provided");
+      setShowToast(true);
+    }
+  }
+
   return (
     <>
       {status === "loading" ? (
@@ -175,10 +192,10 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
                   <Form.Label>Timeslot</Form.Label>
                   <Form.Select required name="timeslot" onChange={handleChange} value={bookingFormState.timeslot}>
                     {[...Array(24)].map((x, i) =>
-                      i < 10 ? <option value={i}>0{i}:00</option> : <option value={i}>{i}:00</option>
+                      i < 10 ? <option key={"opt-" + i} value={i}>0{i}:00</option> : <option key={"opt-" + i} value={i}>{i}:00</option>
                     )}
-                  </Form.Select>                
-                  </Form.Group>
+                  </Form.Select>
+                </Form.Group>
 
                 <Form.Group className="mb-3" controlId="customer_nr">
                   <Form.Label>Number of customers</Form.Label>
@@ -195,16 +212,18 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
               </Button>
             </Modal.Footer>
           </Modal>
+          <ToastContainer position='top-end'>
+            <Toast show={showToast} onClose={() => toogleToast()} delay={3000} autohide>
+              <Toast.Header>
+                <strong className="me-auto">Booking updated!!</strong>
+              </Toast.Header>
+              <Toast.Body>{toastBody}</Toast.Body>
+            </Toast>
+          </ToastContainer>
         </>
       )}
-
-
-
     </>
-
-
   );
-
 }
 
 export default BookingTable;

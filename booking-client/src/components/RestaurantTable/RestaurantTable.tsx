@@ -33,7 +33,7 @@ export default function RestaurantTable() {
                     </thead>
                     <tbody>
                         {data.map((rte: any) => (
-                            <tr>
+                            <tr key={"row"+rte._id}>
                                 <td>{rte.name}</td>
                                 <td>
                                     <Link to={`/admin/${rte._id}`} className="btn btn-primary">Admin</Link>

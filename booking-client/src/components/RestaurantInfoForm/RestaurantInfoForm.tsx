@@ -23,7 +23,7 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
   const { mutate: createMutation } = useMutation(createRestaurant, {
     onSuccess: data => {
       const message = "Restaurant created"
-      alert(message);
+      //alert(message);
     },
     onError: (e: any) => {
       alert("there was an error: "+e.response.data.message);
@@ -33,7 +33,7 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
   const { mutate: updateMutation } = useMutation(updateRestaurant, {
     onSuccess: data => {
       const message = "Restaurant modified"
-      alert(message);
+      //alert(message);
     },
     onError: (e: any) => {
       alert("there was an error:"+e.response.data.message);
@@ -80,8 +80,8 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
           <Form.Label>Opening Hour</Form.Label>
           <Form.Select required name="opening_hour" onChange={handleChange} value={restaurantFormState.opening_hour}>
             {[...Array(24)].map((x, i) =>
-              i < 10 ? <option value={i}>0{i}:00</option> : <option value={i}>{i}:00</option>
-            )}
+                      i < 10 ? <option key={"opt-"+i} value={i}>0{i}:00</option> : <option key={"opt-"+i} value={i}>{i}:00</option>
+                      )}
           </Form.Select>
         </Form.Group>
 
@@ -89,8 +89,8 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
           <Form.Label>Closing Hour</Form.Label>
           <Form.Select required name="closing_hour" onChange={handleChange} value={restaurantFormState.closing_hour}>
             {[...Array(24)].map((x, i) =>
-              i < 10 ? <option value={i}>0{i}:00</option> : <option value={i}>{i}:00</option>
-            )}
+                      i < 10 ? <option key={"opt-"+i} value={i}>0{i}:00</option> : <option key={"opt-"+i} value={i}>{i}:00</option>
+                      )}
           </Form.Select>
         </Form.Group>
 
