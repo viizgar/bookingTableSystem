@@ -72,7 +72,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
       toogleToast(message);
     },
     onError: (e: any) => {
-      alert("there was an error:" + e.response.data.message);
+      toogleToast("there was an error:" + e.response.data.message);
     }
   });
 
@@ -83,7 +83,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
       data.push(res)
     },
     onError: (e: any) => {
-      alert("there was an error:" + e.response.data.message);
+      toogleToast("there was an error:" + e.response.data.message);
     }
   });
 
@@ -96,7 +96,7 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
 
     },
     onError: (e: any) => {
-      alert("there was an error:" + e.response.data.message);
+      toogleToast("there was an error:" + e.response.data.message);
     }
   });
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Toast, ToastContainer } from "react-bootstrap";
 import axiosClient from "../../axios";
 import { useMutation } from 'react-query';
 import Restaurant from "../../types/Restaurant";
@@ -9,6 +9,18 @@ import Restaurant from "../../types/Restaurant";
 
 export default function RestaurantInfoForm(props: { restaurant: any; }) {
   const [restaurantFormState, setRestaurantFormState] = useState(props.restaurant);
+  const [showToast, setShowToast] = useState(false);
+  const [toastBody, setToastBody] = useState("default");
+
+  const toogleToast = (text?: string) => {
+    if (showToast) {
+      setToastBody("");
+      setShowToast(false);
+    } else {
+      setToastBody(text ? text : "No text provided");
+      setShowToast(true);
+    }
+  }
 
   const createRestaurant = async (data: Restaurant) => {
     const { data: response } = await axiosClient.post('/restaurant', data);
@@ -23,20 +35,21 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
   const { mutate: createMutation } = useMutation(createRestaurant, {
     onSuccess: data => {
       const message = "Restaurant created"
-      //alert(message);
+      toogleToast(message);
+
     },
     onError: (e: any) => {
-      alert("there was an error: "+e.response.data.message);
+      toogleToast("there was an error:" + e.response.data.message);
     }
   });
 
   const { mutate: updateMutation } = useMutation(updateRestaurant, {
     onSuccess: data => {
       const message = "Restaurant modified"
-      //alert(message);
+      toogleToast(message);
     },
     onError: (e: any) => {
-      alert("there was an error:"+e.response.data.message);
+      toogleToast("there was an error:" + e.response.data.message);
     }
   });
 
@@ -61,6 +74,7 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
   }
 
   return (
+    <>
     <div className="restaurantForm">
       <Form onSubmit={(e) => onFormSubmit(e)}>
         <Form.Group className="mb-3" controlId="name">
@@ -104,6 +118,15 @@ export default function RestaurantInfoForm(props: { restaurant: any; }) {
         </Button>
       </Form>
     </div>
+    <ToastContainer position='top-end'>
+            <Toast show={showToast} onClose={() => toogleToast()} delay={3000} autohide>
+              <Toast.Header>
+                <strong className="me-auto">Restaurant updated!!</strong>
+              </Toast.Header>
+              <Toast.Body>{toastBody}</Toast.Body>
+            </Toast>
+          </ToastContainer>
+    </>
   );
 
 }
