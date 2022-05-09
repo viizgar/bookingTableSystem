@@ -4,6 +4,7 @@ import { Button, ButtonGroup, Form, Modal, Table, Toast, ToastContainer } from "
 import { useMutation, useQuery } from "react-query";
 import axiosClient from "../../axios";
 import Booking from "../../types/Booking";
+var range = require('lodash/range');
 
 function useBookings(id: string | undefined) {
   return useQuery("bookings", async () => {
@@ -17,6 +18,14 @@ function useBookings(id: string | undefined) {
 type BookingProps = { restaurantId: string }
 const BookingTable = ({ restaurantId }: BookingProps) => {
   const { status, data } = useBookings(restaurantId);
+  const { data: restaurantData} = useQuery("rte", async () => {
+  const {data} =  await axiosClient.get(
+    "restaurant/" + restaurantId
+  )
+return data;  
+}
+);
+
 
   const [showModal, setShowModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -191,8 +200,8 @@ const BookingTable = ({ restaurantId }: BookingProps) => {
                 <Form.Group className="mb-3" controlId="timeslot">
                   <Form.Label>Timeslot</Form.Label>
                   <Form.Select required name="timeslot" onChange={handleChange} value={bookingFormState.timeslot}>
-                    {[...Array(24)].map((x, i) =>
-                      i < 10 ? <option key={"opt-" + i} value={i}>0{i}:00</option> : <option key={"opt-" + i} value={i}>{i}:00</option>
+                    {[...range(restaurantData.opening_hour, restaurantData.closing_hour)].map((x, i) =>
+                      x < 10 ? <option key={"opt-" + x} value={i}>0{x}:00</option> : <option key={"opt-" + x} value={x}>{x}:00</option>
                     )}
                   </Form.Select>
                 </Form.Group>
